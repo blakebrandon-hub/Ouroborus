@@ -22,6 +22,7 @@ CORS(app, resources={r"/api/*": {"origins": "*"}})
 # GEMINI
 # ─────────────────────────────────────────────────────────────────────────────
 
+# "gemini-3.1-pro-preview"
 GEMINI_MODEL = "gemini-2.5-pro"
 
 # Use environment variable in production, fallback for local dev
