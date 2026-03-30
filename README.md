@@ -276,3 +276,5 @@ Early observations:
 - It rewrites its prompt to be more specific about its process, not to change its nature
 
 Built as an exploration of self-modifying AI systems. The name "Ouroboros" references the ancient symbol of a serpent eating its own tail - a cycle of self-reference and transformation.
+
+#### **⚠️ Warning: Oroborus can learn to overwrite files.**
