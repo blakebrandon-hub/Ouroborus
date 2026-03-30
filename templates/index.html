@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ouroboros</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: #0a0a0a;
+            color: #c8c8c8;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            padding: 20px 30px;
+            border-bottom: 1px solid #1a1a1a;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .title {
+            font-size: 1.2em;
+            color: #666;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+        }
+
+        .version-badge {
+            font-size: 0.75em;
+            color: #333;
+            border: 1px solid #222;
+            padding: 2px 8px;
+            border-radius: 3px;
+        }
+
+        .main {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* ── SIDEBAR ── */
+        .sidebar {
+            width: 260px;
+            border-right: 1px solid #1a1a1a;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .sidebar-section {
+            padding: 15px;
+            border-bottom: 1px solid #1a1a1a;
+        }
+
+        .sidebar-label {
+            font-size: 0.7em;
+            color: #444;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .memory-item {
+            font-size: 0.8em;
+            color: #666;
+            margin-bottom: 4px;
+            word-break: break-all;
+        }
+
+        .memory-key { color: #444; }
+        .memory-value { color: #888; }
+
+        .function-item {
+            font-size: 0.8em;
+            color: #555;
+            margin-bottom: 4px;
+        }
+
+        .prompt-preview {
+            font-size: 0.75em;
+            color: #444;
+            line-height: 1.5;
+            max-height: 120px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+
+        /* ── CONVERSATION ── */
+        .conversation-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 30px;
+        }
+
+        .message {
+            margin-bottom: 16px;
+            max-width: 800px;
+        }
+
+        .message-label {
+            font-size: 0.7em;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .message-text {
+            font-size: 0.9em;
+            line-height: 1.6;
+            padding: 10px 14px;
+            border-radius: 3px;
+        }
+
+        /* Message types */
+        .msg-user .message-label { color: #555; }
+        .msg-user .message-text { background: #111; color: #888; border-left: 2px solid #222; }
+
+        .msg-say .message-label { color: #8a8; }
+        .msg-say .message-text { background: #0d120d; color: #aaa; border-left: 2px solid #3a5a3a; }
+
+        .msg-think .message-label { color: #445; }
+        .msg-think .message-text { background: #0a0a0f; color: #556; border-left: 2px solid #223; font-style: italic; }
+
+        .msg-search .message-label { color: #885; }
+        .msg-search .message-text { background: #120f0a; color: #998; border-left: 2px solid #554; }
+
+        .msg-remember .message-label { color: #558; }
+        .msg-remember .message-text { background: #0a0a12; color: #779; border-left: 2px solid #336; }
+
+        .msg-recall .message-label { color: #558; }
+        .msg-recall .message-text { background: #0a0a12; color: #779; border-left: 2px solid #336; }
+
+        .msg-write_function .message-label { color: #858; }
+        .msg-write_function .message-text { background: #110a11; color: #a8a; border-left: 2px solid #535; }
+
+        .msg-call_function .message-label { color: #858; }
+        .msg-call_function .message-text { background: #110a11; color: #998; border-left: 2px solid #535; }
+
+        .msg-execute .message-label { color: #858; }
+        .msg-execute .message-text { background: #110a11; color: #998; border-left: 2px solid #535; }
+
+        .msg-rewrite_prompt .message-label { color: #a55; }
+        .msg-rewrite_prompt .message-text { background: #120a0a; color: #c77; border-left: 2px solid #633; }
+
+        pre {
+            white-space: pre-wrap;
+            word-break: break-all;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+        }
+
+        /* ── INPUT ── */
+        .input-area {
+            padding: 15px 30px;
+            border-top: 1px solid #1a1a1a;
+            display: flex;
+            gap: 10px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            background: #111;
+            border: 1px solid #222;
+            color: #c8c8c8;
+            padding: 10px 14px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            border-radius: 3px;
+            outline: none;
+        }
+
+        input[type="text"]:focus { border-color: #3a3a3a; }
+
+        button {
+            background: #111;
+            border: 1px solid #222;
+            color: #666;
+            padding: 10px 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            cursor: pointer;
+            border-radius: 3px;
+            transition: all 0.2s;
+            letter-spacing: 1px;
+        }
+
+        button:hover { border-color: #444; color: #999; }
+        button:disabled { opacity: 0.3; cursor: not-allowed; }
+
+        .btn-autonomous { color: #556; border-color: #223; }
+        .btn-autonomous:hover { color: #889; border-color: #446; }
+
+        .loading {
+            color: #333;
+            font-size: 0.8em;
+            padding: 10px 30px;
+            letter-spacing: 2px;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #222; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="title">Ouroboros</div>
+    <div class="version-badge" id="promptVersion">v1</div>
+</header>
+
+<div class="main">
+    <div class="sidebar">
+        <div class="sidebar-section">
+            <div class="sidebar-label">Memory</div>
+            <div id="memoryList"><span style="color:#333;font-size:0.8em">(empty)</span></div>
+        </div>
+        <div class="sidebar-section">
+            <div class="sidebar-label">Functions</div>
+            <div id="functionList"><span style="color:#333;font-size:0.8em">(none)</span></div>
+        </div>
+        <div class="sidebar-section" style="flex:1;overflow:hidden;display:flex;flex-direction:column">
+            <div class="sidebar-label">System Prompt</div>
+            <div class="prompt-preview" id="promptPreview">(loading...)</div>
+        </div>
+    </div>
+
+    <div class="conversation-area">
+        <div class="messages" id="messages"></div>
+        <div class="loading" id="loading" style="display:none">processing...</div>
+        <div class="input-area">
+            <input type="text" id="messageInput" placeholder="speak to it..." />
+            <button id="sendBtn">send</button>
+            <button class="btn-autonomous" id="autonomousBtn" title="Let Ouroboros act autonomously">◈ auto</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ── STATE ──
+    let promptVersion = 1;
+
+    // ── INIT ──
+    loadSidebar();
+
+    // ── SIDEBAR ──
+    async function loadSidebar() {
+        // Memory
+        const memRes = await fetch('/api/memory');
+        const memory = await memRes.json();
+        const memDiv = document.getElementById('memoryList');
+        const keys = Object.keys(memory);
+        if (keys.length) {
+            memDiv.innerHTML = keys.map(k =>
+                `<div class="memory-item"><span class="memory-key">${k}:</span> <span class="memory-value">${memory[k].substring(0, 40)}${memory[k].length > 40 ? '...' : ''}</span></div>`
+            ).join('');
+        } else {
+            memDiv.innerHTML = '<span style="color:#333;font-size:0.8em">(empty)</span>';
+        }
+
+        // Functions
+        const fnRes = await fetch('/api/functions');
+        const fnData = await fnRes.json();
+        const fnDiv = document.getElementById('functionList');
+        if (fnData.functions && fnData.functions.length) {
+            fnDiv.innerHTML = fnData.functions.map(f =>
+                `<div class="function-item">⚙ ${f.name}</div>`
+            ).join('');
+        } else {
+            fnDiv.innerHTML = '<span style="color:#333;font-size:0.8em">(none)</span>';
+        }
+
+        // System prompt
+        const promptRes = await fetch('/api/system_prompt');
+        const prompt = await promptRes.json();
+        if (prompt) {
+            document.getElementById('promptPreview').textContent = prompt.content;
+            document.getElementById('promptVersion').textContent = `v${prompt.version}`;
+            promptVersion = prompt.version;
+        }
+    }
+
+    // ── MESSAGES ──
+    function addMessage(type, data) {
+        const messages = document.getElementById('messages');
+        const div = document.createElement('div');
+        div.className = `message msg-${type}`;
+
+        const labels = {
+            user: 'you',
+            say: 'ouroboros',
+            think: 'thinking',
+            search: 'search',
+            remember: 'memory ←',
+            recall: 'memory →',
+            forget: 'memory ✕',
+            write_function: 'function written',
+            call_function: 'function called',
+            execute: 'executed',
+            rewrite_prompt: 'prompt rewritten',
+        };
+
+        const label = labels[type] || type;
+
+        let content = '';
+        if (type === 'user') {
+            content = data.text;
+        } else if (type === 'say') {
+            content = data.text;
+        } else if (type === 'think') {
+            content = `<em>${data.text}</em>`;
+        } else if (type === 'search') {
+            content = `<strong>${data.query}</strong>\n\n${data.result}`;
+        } else if (type === 'remember') {
+            content = `${data.key} = ${data.value}`;
+        } else if (type === 'recall') {
+            content = data.text;
+        } else if (type === 'forget') {
+            content = `deleted: ${data.key}`;
+        } else if (type === 'write_function') {
+            content = `${data.name}\n\n<pre>${data.code}</pre>`;
+        } else if (type === 'call_function') {
+            content = `${data.name}\n\n<pre>${data.result}</pre>`;
+        } else if (type === 'execute') {
+            content = `<pre>${data.code}</pre>\n→ <pre>${data.result}</pre>`;
+        } else if (type === 'rewrite_prompt') {
+            content = `<pre>${data.text}</pre>`;
+        }
+
+        div.innerHTML = `
+            <div class="message-label">${label}</div>
+            <div class="message-text">${content}</div>
+        `;
+
+        messages.appendChild(div);
+        messages.scrollTop = messages.scrollHeight;
+    }
+
+    // ── SEND ──
+    async function send(autonomous = false) {
+        const input = document.getElementById('messageInput');
+        const text = input.value.trim();
+
+        if (!autonomous && !text) return;
+
+        if (!autonomous) {
+            addMessage('user', { text });
+            input.value = '';
+        }
+
+        document.getElementById('loading').style.display = 'block';
+        document.getElementById('sendBtn').disabled = true;
+        document.getElementById('autonomousBtn').disabled = true;
+
+        try {
+            const url = autonomous ? '/api/prompt' : '/api/chat';
+            const options = autonomous
+                ? { method: 'GET' }
+                : {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: text })
+                };
+
+            const res = await fetch(url, options);
+            const data = await res.json();
+
+            if (data.messages) {
+                for (const msg of data.messages) {
+                    addMessage(msg.type, msg);
+                }
+            }
+
+            // Refresh sidebar
+            await loadSidebar();
+
+        } catch (err) {
+            console.error(err);
+        } finally {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('sendBtn').disabled = false;
+            document.getElementById('autonomousBtn').disabled = false;
+        }
+    }
+
+    document.getElementById('sendBtn').addEventListener('click', () => send(false));
+    document.getElementById('autonomousBtn').addEventListener('click', () => send(true));
+    document.getElementById('messageInput').addEventListener('keypress', e => {
+        if (e.key === 'Enter') send(false);
+    });
+</script>
+</body>
+</html>
