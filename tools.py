@@ -7,8 +7,11 @@ import sys
 import io
 import traceback
 import requests
+import re
 import time
 import datetime
+from bs4 import BeautifulSoup as bs4
+import numpy as np
 from supabase_client import recall, recall_all, remember, forget, get_function
 
 
@@ -66,6 +69,7 @@ def web_search(query: str) -> str:
 SANDBOX_GLOBALS = {
     '__builtins__': {
         '__import__': __import__,
+        'open': open,
         'print': print,
         'len': len,
         'range': range,
@@ -98,13 +102,20 @@ SANDBOX_GLOBALS = {
         'any': any,
         'all': all,
         'repr': repr,
+        'reversed': reversed,
         'Exception': Exception,
         'ValueError': ValueError,
         'TypeError': TypeError,
         'KeyError': KeyError,
     },
+    're': re,
     'requests': requests,
     'datetime': datetime,
+    'time': time,
+    'bs4': bs4,
+    'BeautifulSoup': bs4,
+    'np': np,
+    'numpy': np,
 }
 
 
