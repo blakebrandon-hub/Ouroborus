@@ -279,4 +279,8 @@ Built as an exploration of self-modifying AI systems. The name "Ouroboros" refer
 
 ---
 
+<img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/84ad207a-aa28-4c53-88e7-85a4b45ef872" />
+
+---
+
 #### **⚠️ Warning: Oroborus can learn to overwrite files.**
