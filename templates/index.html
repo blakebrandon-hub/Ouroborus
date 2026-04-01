@@ -3,830 +3,406 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Garden World</title>
+    <title>Ouroboros</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: 'Georgia', serif;
-            background: linear-gradient(to bottom, #1a1a2e 0%, #0f0f1e 100%);
-            color: #e0e0e0;
+            font-family: 'Courier New', monospace;
+            background: #0a0a0a;
+            color: #c8c8c8;
             min-height: 100vh;
-            padding: 20px;
-        }
-
-        .main-layout {
-            display: grid;
-            grid-template-columns: 280px 1fr 280px;
-            gap: 20px;
-            max-width: 1600px;
-            margin: 0 auto;
-        }
-
-        /* SIDE PANELS */
-        .side-panel {
-            background: #16161f;
-            border: 1px solid #3a3a4a;
-            border-radius: 8px;
-            padding: 15px;
-            height: fit-content;
-            max-height: calc(100vh - 40px);
-            overflow-y: auto;
-            position: sticky;
-            top: 20px;
-        }
-
-        .panel-section {
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #2a2a3a;
-        }
-
-        .panel-section:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
-        }
-
-        .panel-title {
-            font-size: 0.85em;
-            color: #7fba7f;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 10px;
-            font-weight: bold;
-        }
-
-        .panel-item {
-            font-size: 0.9em;
-            margin-bottom: 8px;
-            padding: 8px;
-            background: #1a1a2e;
-            border-radius: 4px;
-            border-left: 2px solid #3a3a4a;
-        }
-
-        .panel-item-header {
-            color: #999;
-            font-size: 0.8em;
-            text-transform: uppercase;
-            margin-bottom: 3px;
-        }
-
-        .panel-item-content {
-            color: #e0e0e0;
-        }
-
-        .plant-item {
-            border-left-color: #7fba7f;
-        }
-
-        .plant-health {
-            font-size: 0.8em;
-            color: #999;
-            margin-top: 3px;
-        }
-
-        .health-good { color: #7fba7f; }
-        .health-warning { color: #b89f5a; }
-        .health-critical { color: #ba5a5a; }
-
-        .object-item {
-            border-left-color: #5a7fb8;
-        }
-
-        .location-rowan {
-            border-left-color: #b89f5a;
-        }
-
-        .location-mira {
-            border-left-color: #ba7fb8;
-        }
-
-        /* CENTER COLUMN */
-        .center-column {
-            min-width: 0;
-        }
-
-        .container {
-            max-width: 100%;
+            display: flex;
+            flex-direction: column;
         }
 
         header {
-            text-align: center;
-            padding: 30px 0;
-            border-bottom: 1px solid #3a3a4a;
-            margin-bottom: 30px;
-        }
-
-        h1 {
-            font-size: 2.5em;
-            color: #7fba7f;
-            font-weight: normal;
-            letter-spacing: 2px;
-        }
-
-        .subtitle {
-            color: #999;
-            font-size: 0.9em;
-            margin-top: 10px;
-            font-style: italic;
-        }
-
-        .character-select {
+            padding: 20px 30px;
+            border-bottom: 1px solid #1a1a1a;
             display: flex;
-            gap: 10px;
-            justify-content: center;
-            margin-bottom: 20px;
+            align-items: center;
+            gap: 15px;
         }
 
-        .character-btn {
-            padding: 10px 30px;
-            border: 2px solid #3a3a4a;
-            background: #1a1a2e;
-            color: #999;
-            cursor: pointer;
-            border-radius: 5px;
-            font-size: 1em;
-            transition: all 0.3s;
+        .title {
+            font-size: 1.2em;
+            color: #666;
+            letter-spacing: 4px;
+            text-transform: uppercase;
         }
 
-        .character-btn.active {
-            border-color: #7fba7f;
-            color: #7fba7f;
-            background: #2a2a3e;
+        .version-badge {
+            font-size: 0.75em;
+            color: #333;
+            border: 1px solid #222;
+            padding: 2px 8px;
+            border-radius: 3px;
         }
 
-        .conversation {
-            background: #16161f;
-            border: 1px solid #3a3a4a;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
-            max-height: 500px;
-            overflow-y: auto;
-            min-height: 300px;
-        }
-
-        .message {
-            margin-bottom: 20px;
-            padding: 12px;
-            border-radius: 5px;
-            line-height: 1.6;
-        }
-
-        .message.action {
-            background: #1e2838;
-            border-left: 3px solid #5a7fb8;
-        }
-
-        .message.dialog {
-            background: #2a2a1e;
-            border-left: 3px solid #b89f5a;
-        }
-
-        .message.narrator {
-            background: #1e2e1e;
-            border-left: 3px solid #7fba7f;
-            font-style: italic;
-        }
-
-        .message.photo {
-            background: #2e1e2e;
-            border-left: 3px solid #ba7fb8;
-            padding: 0;
+        .main {
+            display: flex;
+            flex: 1;
             overflow: hidden;
         }
 
-        .message-header {
+        /* ── SIDEBAR ── */
+        .sidebar {
+            width: 260px;
+            border-right: 1px solid #1a1a1a;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .sidebar-section {
+            padding: 15px;
+            border-bottom: 1px solid #1a1a1a;
+        }
+
+        .sidebar-label {
+            font-size: 0.7em;
+            color: #444;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .memory-item {
+            font-size: 0.8em;
+            color: #666;
+            margin-bottom: 4px;
+            word-break: break-all;
+        }
+
+        .memory-key { color: #444; }
+        .memory-value { color: #888; }
+
+        .function-item {
+            font-size: 0.8em;
+            color: #555;
+            margin-bottom: 4px;
+        }
+
+        .prompt-preview {
+            font-size: 0.75em;
+            color: #444;
+            line-height: 1.5;
+            max-height: 120px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+
+        /* ── CONVERSATION ── */
+        .conversation-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 30px;
+        }
+
+        .message {
+            margin-bottom: 16px;
+            max-width: 800px;
+        }
+
+        .message-label {
+            font-size: 0.7em;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .message-text {
+            font-size: 0.9em;
+            line-height: 1.6;
+            padding: 10px 14px;
+            border-radius: 3px;
+        }
+
+        /* Message types */
+        .msg-user .message-label { color: #555; }
+        .msg-user .message-text { background: #111; color: #888; border-left: 2px solid #222; }
+
+        .msg-say .message-label { color: #8a8; }
+        .msg-say .message-text { background: #0d120d; color: #aaa; border-left: 2px solid #3a5a3a; }
+
+        .msg-think .message-label { color: #445; }
+        .msg-think .message-text { background: #0a0a0f; color: #556; border-left: 2px solid #223; font-style: italic; }
+
+        .msg-search .message-label { color: #885; }
+        .msg-search .message-text { background: #120f0a; color: #998; border-left: 2px solid #554; }
+
+        .msg-remember .message-label { color: #558; }
+        .msg-remember .message-text { background: #0a0a12; color: #779; border-left: 2px solid #336; }
+
+        .msg-recall .message-label { color: #558; }
+        .msg-recall .message-text { background: #0a0a12; color: #779; border-left: 2px solid #336; }
+
+        .msg-write_function .message-label { color: #858; }
+        .msg-write_function .message-text { background: #110a11; color: #a8a; border-left: 2px solid #535; }
+
+        .msg-call_function .message-label { color: #858; }
+        .msg-call_function .message-text { background: #110a11; color: #998; border-left: 2px solid #535; }
+
+        .msg-execute .message-label { color: #858; }
+        .msg-execute .message-text { background: #110a11; color: #998; border-left: 2px solid #535; }
+
+        .msg-rewrite_prompt .message-label { color: #a55; }
+        .msg-rewrite_prompt .message-text { background: #120a0a; color: #c77; border-left: 2px solid #633; }
+
+        pre {
+            white-space: pre-wrap;
+            word-break: break-all;
+            font-family: 'Courier New', monospace;
             font-size: 0.85em;
-            color: #999;
-            margin-bottom: 5px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
         }
 
-        .photo-img {
-            width: 100%;
-            display: block;
-        }
-
-        .photo-caption {
-            padding: 12px;
-            font-size: 0.9em;
-            color: #ccc;
-        }
-
-        .input-section {
-            background: #16161f;
-            border: 1px solid #3a3a4a;
-            border-radius: 8px;
-            padding: 20px;
-        }
-
-        .input-group {
-            margin-bottom: 15px;
-        }
-
-        .input-group:last-child {
-            margin-bottom: 0;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            color: #999;
-            font-size: 0.9em;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+        /* ── INPUT ── */
+        .input-area {
+            padding: 15px 30px;
+            border-top: 1px solid #1a1a1a;
+            display: flex;
+            gap: 10px;
         }
 
         input[type="text"] {
-            width: 100%;
-            padding: 12px;
-            background: #0f0f1e;
-            border: 1px solid #3a3a4a;
-            border-radius: 5px;
-            color: #e0e0e0;
-            font-size: 1em;
-            font-family: 'Georgia', serif;
-        }
-
-        input[type="text"]:focus {
+            flex: 1;
+            background: #111;
+            border: 1px solid #222;
+            color: #c8c8c8;
+            padding: 10px 14px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            border-radius: 3px;
             outline: none;
-            border-color: #7fba7f;
         }
 
-        .button-group {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
+        input[type="text"]:focus { border-color: #3a3a3a; }
 
         button {
-            padding: 12px 24px;
-            border: none;
-            border-radius: 5px;
+            background: #111;
+            border: 1px solid #222;
+            color: #666;
+            padding: 10px 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
             cursor: pointer;
-            font-size: 1em;
-            transition: all 0.3s;
-            font-family: 'Georgia', serif;
+            border-radius: 3px;
+            transition: all 0.2s;
+            letter-spacing: 1px;
         }
 
-        .btn-action {
-            background: #5a7fb8;
-            color: white;
-            flex: 1;
-        }
+        button:hover { border-color: #444; color: #999; }
+        button:disabled { opacity: 0.3; cursor: not-allowed; }
 
-        .btn-action:hover {
-            background: #6a8fc8;
-        }
-
-        .btn-dialog {
-            background: #b89f5a;
-            color: white;
-            flex: 1;
-        }
-
-        .btn-dialog:hover {
-            background: #c8af6a;
-        }
-
-        .btn-photo {
-            background: #ba7fb8;
-            color: white;
-            padding: 12px 30px;
-        }
-
-        .btn-photo:hover {
-            background: #ca8fc8;
-        }
-
-        .btn-scrapbook {
-            background: #7fba7f;
-            color: white;
-            padding: 12px 30px;
-        }
-
-        .btn-scrapbook:hover {
-            background: #8fca8f;
-        }
-
-        button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
+        .btn-autonomous { color: #556; border-color: #223; }
+        .btn-autonomous:hover { color: #889; border-color: #446; }
 
         .loading {
-            text-align: center;
-            color: #7fba7f;
-            padding: 20px;
-            font-style: italic;
+            color: #333;
+            font-size: 0.8em;
+            padding: 10px 30px;
+            letter-spacing: 2px;
         }
 
-        /* Scrollbar styling */
-        .conversation::-webkit-scrollbar,
-        .side-panel::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        .conversation::-webkit-scrollbar-track,
-        .side-panel::-webkit-scrollbar-track {
-            background: #0f0f1e;
-        }
-
-        .conversation::-webkit-scrollbar-thumb,
-        .side-panel::-webkit-scrollbar-thumb {
-            background: #3a3a4a;
-            border-radius: 4px;
-        }
-
-        .conversation::-webkit-scrollbar-thumb:hover,
-        .side-panel::-webkit-scrollbar-thumb:hover {
-            background: #4a4a5a;
-        }
-
-        /* Responsive */
-        @media (max-width: 1400px) {
-            .main-layout {
-                grid-template-columns: 240px 1fr 240px;
-            }
-        }
-
-        @media (max-width: 1200px) {
-            .main-layout {
-                grid-template-columns: 1fr;
-            }
-            
-            .side-panel {
-                position: relative;
-                top: 0;
-                max-height: none;
-            }
-        }
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #222; }
     </style>
 </head>
 <body>
-    <div class="main-layout">
-        <!-- LEFT PANEL: Character Info -->
-        <div class="side-panel" id="leftPanel">
-            <div class="panel-section">
-                <div class="panel-title">🚶 Locations</div>
-                <div id="locationsList"></div>
-            </div>
-            
-            <div class="panel-section">
-                <div class="panel-title">🎒 Inventories</div>
-                <div id="inventoriesList"></div>
-            </div>
+
+<header>
+    <div class="title">Ouroboros</div>
+    <div class="version-badge" id="promptVersion">v1</div>
+</header>
+
+<div class="main">
+    <div class="sidebar">
+        <div class="sidebar-section">
+            <div class="sidebar-label">Memory</div>
+            <div id="memoryList"><span style="color:#333;font-size:0.8em">(empty)</span></div>
         </div>
-
-        <!-- CENTER: Main Game -->
-        <div class="center-column">
-            <div class="container">
-                <header>
-                    <h1>🌱 Garden World</h1>
-                    <div class="subtitle">A shared garden in the stars</div>
-                </header>
-
-                <div class="character-select">
-                    <button class="character-btn active" data-character="Rowan">Rowan</button>
-                    <button class="character-btn" data-character="Mira">Mira</button>
-                </div>
-
-                <div class="conversation" id="conversation"></div>
-
-                <div class="input-section">
-                    <div class="input-group">
-                        <label for="actionInput">Perform Action</label>
-                        <input type="text" id="actionInput" placeholder="What do you do?">
-                    </div>
-
-                    <div class="input-group">
-                        <label for="dialogInput">Speak</label>
-                        <input type="text" id="dialogInput" placeholder="What do you say?">
-
-                    </div>
-
-                    <div class="button-group">
-                        <button class="btn-action" id="actionBtn">Perform Action</button>
-                        <button class="btn-dialog" id="dialogBtn">Say Dialog</button>
-                        <button class="btn-photo" id="photoBtn">📸 Take Photo</button>
-                        <button class="btn-scrapbook" id="scrapbookBtn">📖 Scrapbook</button>
-                    </div>
-                </div>
-            </div>
+        <div class="sidebar-section">
+            <div class="sidebar-label">Functions</div>
+            <div id="functionList"><span style="color:#333;font-size:0.8em">(none)</span></div>
         </div>
-
-        <!-- RIGHT PANEL: World State -->
-        <div class="side-panel" id="rightPanel">
-            <div class="panel-section">
-                <div class="panel-title">🌿 Garden</div>
-                <div id="plantsList"></div>
-            </div>
-            
-            <div class="panel-section">
-                <div class="panel-title">📦 World Objects</div>
-                <div id="objectsList"></div>
-            </div>
+        <div class="sidebar-section" style="flex:1;overflow:hidden;display:flex;flex-direction:column">
+            <div class="sidebar-label">System Prompt</div>
+            <div class="prompt-preview" id="promptPreview">(loading...)</div>
         </div>
     </div>
 
-    <script>
-        let currentCharacter = 'Rowan';
-        let lastNarratorText = '';
+    <div class="conversation-area">
+        <div class="messages" id="messages"></div>
+        <div class="loading" id="loading" style="display:none">processing...</div>
+        <div class="input-area">
+            <input type="text" id="messageInput" placeholder="speak to it..." />
+            <button id="sendBtn">send</button>
+            <button class="btn-autonomous" id="autonomousBtn" title="Let Ouroboros act autonomously">◈ auto</button>
+        </div>
+    </div>
+</div>
 
-        const ARCHIVE_EVERY = 12;
-        let messagesSinceLastArchive = 0;
+<script>
+    // ── STATE ──
+    let promptVersion = 1;
 
-        // Character selection
-        document.querySelectorAll('.character-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('.character-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                currentCharacter = btn.dataset.character;
-            });
-        });
+    // ── INIT ──
+    loadSidebar();
 
-        // Update side panels
-        async function updateSidePanels() {
-            try {
-                // Fetch game state
-                const stateRes = await fetch('/api/state');
-                const state = await stateRes.json();
-
-                // Update locations
-                const locationsDiv = document.getElementById('locationsList');
-                locationsDiv.innerHTML = '';
-                const locations = state.character_locations || {};
-                
-                for (const [char, location] of Object.entries(locations)) {
-                    const div = document.createElement('div');
-                    div.className = `panel-item location-${char.toLowerCase()}`;
-                    div.innerHTML = `
-                        <div class="panel-item-header">${char}</div>
-                        <div class="panel-item-content">${location}</div>
-                    `;
-                    locationsDiv.appendChild(div);
-                }
-
-                // Update inventories
-                const inventoriesDiv = document.getElementById('inventoriesList');
-                inventoriesDiv.innerHTML = '';
-                const inventories = state.inventories || {};
-                
-                for (const [char, items] of Object.entries(inventories)) {
-                    const div = document.createElement('div');
-                    div.className = `panel-item location-${char.toLowerCase()}`;
-                    div.innerHTML = `
-                        <div class="panel-item-header">${char}</div>
-                        <div class="panel-item-content">${items.length > 0 ? items.join(', ') : '(empty)'}</div>
-                    `;
-                    inventoriesDiv.appendChild(div);
-                }
-
-                // Update plants
-                const plantsRes = await fetch('/api/plants');
-                const plantsData = await plantsRes.json();
-                const plantsDiv = document.getElementById('plantsList');
-                plantsDiv.innerHTML = '';
-                
-                const plants = plantsData.plants || [];
-                if (plants.length === 0) {
-                    plantsDiv.innerHTML = '<div class="panel-item">No plants yet</div>';
-                } else {
-                    plants.forEach(plant => {
-                        const health = plant.health || 100;
-                        const healthClass = health >= 70 ? 'health-good' : health >= 40 ? 'health-warning' : 'health-critical';
-                        const needsWater = plant.needs_water ? ' 💧' : '';
-                        
-                        const div = document.createElement('div');
-                        div.className = 'panel-item plant-item';
-                        div.innerHTML = `
-                            <div class="panel-item-header">${plant.name}${needsWater}</div>
-                            <div class="panel-item-content">${plant.stage || 'Seed'}</div>
-                            <div class="plant-health ${healthClass}">Health: ${health}%</div>
-                        `;
-                        plantsDiv.appendChild(div);
-                    });
-                }
-
-                // Update world objects
-                const objectsRes = await fetch('/api/objects');
-                const objectsData = await objectsRes.json();
-                const objectsDiv = document.getElementById('objectsList');
-                objectsDiv.innerHTML = '';
-                
-                const objects = objectsData.objects || [];
-                if (objects.length === 0) {
-                    objectsDiv.innerHTML = '<div class="panel-item">No objects</div>';
-                } else {
-                    // Group by location
-                    const byLocation = {};
-                    objects.forEach(obj => {
-                        if (!byLocation[obj.location]) {
-                            byLocation[obj.location] = [];
-                        }
-                        byLocation[obj.location].push(obj.name);
-                    });
-
-                    for (const [location, items] of Object.entries(byLocation)) {
-                        const div = document.createElement('div');
-                        div.className = 'panel-item object-item';
-                        div.innerHTML = `
-                            <div class="panel-item-header">${location}</div>
-                            <div class="panel-item-content">${items.join(', ')}</div>
-                        `;
-                        objectsDiv.appendChild(div);
-                    }
-                }
-
-            } catch (error) {
-                console.error('Error updating side panels:', error);
-            }
+    // ── SIDEBAR ──
+    async function loadSidebar() {
+        // Memory
+        const memRes = await fetch('/api/memory');
+        const memory = await memRes.json();
+        const memDiv = document.getElementById('memoryList');
+        const keys = Object.keys(memory);
+        if (keys.length) {
+            memDiv.innerHTML = keys.map(k =>
+                `<div class="memory-item"><span class="memory-key">${k}:</span> <span class="memory-value">${memory[k].substring(0, 40)}${memory[k].length > 40 ? '...' : ''}</span></div>`
+            ).join('');
+        } else {
+            memDiv.innerHTML = '<span style="color:#333;font-size:0.8em">(empty)</span>';
         }
 
-        // Load conversation history
-        async function loadHistory() {
-            try {
-                const response = await fetch('/api/history');
-                const data = await response.json();
-                
-                const conversation = document.getElementById('conversation');
-                conversation.innerHTML = '';
-
-                for (const msg of data.history) {
-                    if (msg.type === 'narrator') {
-                        lastNarratorText = msg.text;
-                    }
-                    addMessage(msg.type, msg.character, msg.text);
-                }
-
-                await updateSidePanels();
-            } catch (error) {
-                console.error('Error loading history:', error);
-            }
+        // Functions
+        const fnRes = await fetch('/api/functions');
+        const fnData = await fnRes.json();
+        const fnDiv = document.getElementById('functionList');
+        if (fnData.functions && fnData.functions.length) {
+            fnDiv.innerHTML = fnData.functions.map(f =>
+                `<div class="function-item">⚙ ${f.name}</div>`
+            ).join('');
+        } else {
+            fnDiv.innerHTML = '<span style="color:#333;font-size:0.8em">(none)</span>';
         }
 
-        // Add message to conversation
-        function addMessage(type, character, text, imageData = null) {
-            const conversation = document.getElementById('conversation');
-            const message = document.createElement('div');
-            message.className = `message ${type}`;
+        // System prompt
+        const promptRes = await fetch('/api/system_prompt');
+        const prompt = await promptRes.json();
+        if (prompt) {
+            document.getElementById('promptPreview').textContent = prompt.content;
+            document.getElementById('promptVersion').textContent = `v${prompt.version}`;
+            promptVersion = prompt.version;
+        }
+    }
 
-            if (type === 'photo' && imageData) {
-                let imgSrc = '';
-                if (imageData.image_url) {
-                    imgSrc = imageData.image_url;
-                } else if (imageData.image_base64) {
-                    imgSrc = `data:image/png;base64,${imageData.image_base64}`;
-                }
-                
-                message.innerHTML = `
-                    <img src="${imgSrc}" class="photo-img" alt="Garden memory">
-                    <div class="photo-caption">
-                        <div class="message-header">Memory captured</div>
-                        ${imageData.narrator_text || ''}
-                    </div>
-                `;
-            } else {
-                const header = type === 'narrator' ? 'Narrator' : 
-                              type === 'action' ? `${character} (action)` :
-                              `${character} (dialog)`;
-                
-                message.innerHTML = `
-                    <div class="message-header">${header}</div>
-                    <div>${text}</div>
-                `;
-            }
+    // ── MESSAGES ──
+    function addMessage(type, data) {
+        const messages = document.getElementById('messages');
+        const div = document.createElement('div');
+        div.className = `message msg-${type}`;
 
-            conversation.appendChild(message);
-            conversation.scrollTop = conversation.scrollHeight;
+        const labels = {
+            user: 'you',
+            say: 'ouroboros',
+            think: 'thinking',
+            search: 'search',
+            remember: 'memory ←',
+            recall: 'memory →',
+            forget: 'memory ✕',
+            write_function: 'function written',
+            call_function: 'function called',
+            execute: 'executed',
+            rewrite_prompt: 'prompt rewritten',
+        };
+
+        const label = labels[type] || type;
+
+        let content = '';
+        if (type === 'user') {
+            content = data.text;
+        } else if (type === 'say') {
+            content = data.text;
+        } else if (type === 'think') {
+            content = `<em>${data.text}</em>`;
+        } else if (type === 'search') {
+            content = `<strong>${data.query}</strong>\n\n${data.result}`;
+        } else if (type === 'remember') {
+            content = `${data.key} = ${data.value}`;
+        } else if (type === 'recall') {
+            content = data.text;
+        } else if (type === 'forget') {
+            content = `deleted: ${data.key}`;
+        } else if (type === 'write_function') {
+            content = `${data.name}\n\n<pre>${data.code}</pre>`;
+        } else if (type === 'call_function') {
+            content = `${data.name}\n\n<pre>${data.result}</pre>`;
+        } else if (type === 'execute') {
+            content = `<pre>${data.code}</pre>\n→ <pre>${data.result}</pre>`;
+        } else if (type === 'rewrite_prompt') {
+            content = `<pre>${data.text}</pre>`;
         }
 
-        // Show loading state
-        function showLoading() {
-            const conversation = document.getElementById('conversation');
-            const loading = document.createElement('div');
-            loading.className = 'loading';
-            loading.id = 'loading';
-            loading.textContent = '...';
-            conversation.appendChild(loading);
-            conversation.scrollTop = conversation.scrollHeight;
-        }
+        div.innerHTML = `
+            <div class="message-label">${label}</div>
+            <div class="message-text">${content}</div>
+        `;
 
-        function hideLoading() {
-            const loading = document.getElementById('loading');
-            if (loading) loading.remove();
-        }
+        messages.appendChild(div);
+        messages.scrollTop = messages.scrollHeight;
+    }
 
-        // Handle action
-        document.getElementById('actionBtn').addEventListener('click', async () => {
-            const input = document.getElementById('actionInput');
-            const text = input.value.trim();
-            if (!text) return;
+    // ── SEND ──
+    async function send(autonomous = false) {
+        const input = document.getElementById('messageInput');
+        const text = input.value.trim();
 
-            addMessage('action', currentCharacter, text);
+        if (!autonomous && !text) return;
+
+        if (!autonomous) {
+            addMessage('user', { text });
             input.value = '';
-            showLoading();
-
-            try {
-                const response = await fetch('/api/action', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        character: currentCharacter,
-                        text: text
-                    })
-                });
-
-                const data = await response.json();
-                hideLoading();
-
-                if (data.messages) {
-                    checkAndArchive(data.messages.length);
-                    for (const item of data.messages) {
-                        if (item.type === 'narrator') {
-                            lastNarratorText = item.text;
-                            addMessage('narrator', item.character, item.text);
-                        } else if (item.type === 'dialog') {
-                            addMessage('dialog', item.character, item.text);
-                        } else if (item.type === 'action') {
-                            addMessage('action', item.character, item.text);
-                        } else if (item.type === 'photo') {
-                            addMessage('photo', item.character, null, { image_url: item.image_url, narrator_text: item.text });
-                        }
-                    }
-                    await updateSidePanels();
-                }
-            } catch (error) {
-                hideLoading();
-                console.error('Error:', error);
-                addMessage('narrator', 'narrator', '[Error: Could not reach the narrator]');
-            }
-        });
-
-        // Handle dialog
-        document.getElementById('dialogBtn').addEventListener('click', async () => {
-            const input = document.getElementById('dialogInput');
-            const text = input.value.trim();
-            if (!text) return;
-
-            addMessage('dialog', currentCharacter, text);
-            input.value = '';
-
-            showLoading();
-
-            try {
-                const response = await fetch('/api/dialog', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        character: currentCharacter,
-                        text: text
-                    })
-                });
-
-                const data = await response.json();
-                hideLoading();
-
-                if (data.messages) {
-                    for (const item of data.messages) {
-                        checkAndArchive(data.messages.length);
-                        if (item.type === 'narrator') {
-                            lastNarratorText = item.text;
-                            addMessage('narrator', item.character, item.text);
-                        } else if (item.type === 'dialog') {
-                            addMessage('dialog', item.character, item.text);
-                        } else if (item.type === 'action') {
-                            addMessage('action', item.character, item.text);
-                        } else if (item.type === 'photo') {
-                            addMessage('photo', item.character, null, { image_url: item.image_url, narrator_text: item.text });
-                        }
-                    }
-                    await updateSidePanels();
-                }
-            } catch (error) {
-                hideLoading();
-                console.error('Error:', error);
-            }
-        });
-
-        // Handle photo
-        document.getElementById('photoBtn').addEventListener('click', async () => {
-            if (!lastNarratorText) {
-                alert('Please perform an action first to generate a scene description.');
-                return;
-            }
-            
-            const photoBtn = document.getElementById('photoBtn');
-            photoBtn.disabled = true;
-            photoBtn.textContent = '📸 Generating...';
-            showLoading();
-
-            try {
-                const response = await fetch('/api/photo', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        narrator_text: lastNarratorText
-                    })
-                });
-
-                const data = await response.json();
-                hideLoading();
-
-                if (data.success) {
-                    addMessage('photo', 'memory', null, data);
-                } else {
-                    addMessage('narrator', 'narrator', `[Photo failed: ${data.error}]`);
-                }
-            } catch (error) {
-                hideLoading();
-                console.error('Error:', error);
-                addMessage('narrator', 'narrator', '[Error: Could not capture photo]');
-            } finally {
-                photoBtn.disabled = false;
-                photoBtn.textContent = '📸 Take Photo';
-            }
-        });
-
-        // Enter key handling
-        document.getElementById('actionInput').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') document.getElementById('actionBtn').click();
-        });
-
-        document.getElementById('dialogInput').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') document.getElementById('dialogBtn').click();
-        });
-
-        // Scrapbook button - load all history
-        document.getElementById('scrapbookBtn').addEventListener('click', async () => {
-            const scrapbookBtn = document.getElementById('scrapbookBtn');
-            scrapbookBtn.disabled = true;
-            scrapbookBtn.textContent = '📖 Loading...';
-            
-            await loadHistory();
-            
-            scrapbookBtn.disabled = false;
-            scrapbookBtn.textContent = '📖 Scrapbook';
-        });
-
-        async function checkAndArchive(newMessageCount) {
-            messagesSinceLastArchive += newMessageCount;
-         
-            if (messagesSinceLastArchive < ARCHIVE_EVERY) return;
-            messagesSinceLastArchive = 0;
-         
-            console.log("🗂️  Archive threshold reached — requesting summary...");
-         
-            try {
-                const histRes  = await fetch('/api/history');
-                const histData = await histRes.json();
-                const recent   = (histData.history || []).slice(-ARCHIVE_EVERY);
-         
-                const logLines = recent.map(msg => {
-                    if (msg.type === 'action')   return `[ACTION] ${msg.character}: ${msg.text}`;
-                    if (msg.type === 'dialog')   return `[DIALOG] ${msg.character}: "${msg.text}"`;
-                    if (msg.type === 'narrator') return `[NARRATOR] ${msg.text}`;
-                    if (msg.type === 'photo')    return `[PHOTO] ${msg.character} captured: "${msg.text}"`;
-                    return '';
-                }).filter(Boolean);
-         
-                const logSegment = logLines.join('\n');
-         
-                const countRes  = await fetch('/api/message_count');
-                const countData = await countRes.json();
-                const totalCount = countData.count || 0;
-                const segEnd     = totalCount;
-                const segStart   = Math.max(0, totalCount - ARCHIVE_EVERY);
-         
-                await fetch('/api/archive', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        context:      logSegment,
-                        segment_start: segStart,
-                        segment_end:   segEnd
-                    })
-                });
-         
-                console.log(`🗂️  Archive saved (entries ${segStart}–${segEnd})`);
-         
-            } catch (err) {
-                console.warn("🗂️  Archive failed (non-fatal):", err);
-            }
         }
 
-        // Initial load
-        loadHistory();
-        
-        // Auto-refresh side panels every 30 seconds
-        setInterval(updateSidePanels, 30000);
-    </script>
+        document.getElementById('loading').style.display = 'block';
+        document.getElementById('sendBtn').disabled = true;
+        document.getElementById('autonomousBtn').disabled = true;
+
+        try {
+            const url = autonomous ? '/api/prompt' : '/api/chat';
+            const options = autonomous
+                ? { method: 'GET' }
+                : {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: text })
+                };
+
+            const res = await fetch(url, options);
+            const data = await res.json();
+
+            if (data.messages) {
+                for (const msg of data.messages) {
+                    addMessage(msg.type, msg);
+                }
+            }
+
+            // Refresh sidebar
+            await loadSidebar();
+
+        } catch (err) {
+            console.error(err);
+        } finally {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('sendBtn').disabled = false;
+            document.getElementById('autonomousBtn').disabled = false;
+        }
+    }
+
+    document.getElementById('sendBtn').addEventListener('click', () => send(false));
+    document.getElementById('autonomousBtn').addEventListener('click', () => send(true));
+    document.getElementById('messageInput').addEventListener('keypress', e => {
+        if (e.key === 'Enter') send(false);
+    });
+</script>
 </body>
 </html>
